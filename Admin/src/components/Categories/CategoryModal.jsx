@@ -1,46 +1,88 @@
-import { useState } from "react";
-import { FaTimes } from "react-icons/fa";
-import axios from "axios";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage, DATABASE_URL } from "../../services/firebase";
+import { useEffect, useState } from "react";
 
-function CategoryModal({ onClose }) {
+function CategoryModal({ onClose, editCategory, fetchCategories }) {
   const [categoryName, setCategoryName] = useState("");
-  const [image, setImage] = useState('https://placehold.co/300x300/png?text=Category');
+  const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState(
+    "https://placehold.co/300x300/png?text=Category",
+  );
 
-  const onSubmitHandler = async (e) => {
+  useEffect(() => {
+    if (editCategory) {
+      setCategoryName(editCategory.name);
+      setImageUrl(editCategory.image);
+    } else {
+      setCategoryName("");
+      setImageUrl("https://placehold.co/300x300/png?text=Category");
+    }
+  }, [editCategory]);
+
+  const submitHandler = async (e) => {
     e.preventDefault();
 
-    if (!categoryName || !image) {
-      alert("Please fill all fields");
-      return;
-    }
-
     try {
-      const formData = new FormData();
+      let imageUrl = editCategory?.image || "";
 
-      formData.append("file", image);
-      formData.append("upload_preset", "restaurant-app"); // Your upload preset name
+      // Upload new image only if one is selected
+      if (image) {
+        const formData = new FormData();
 
-      const cloudinaryResponse = await axios.post(
-        "https://api.cloudinary.com/v1_1/gckcyscd/image/upload",
-        formData,
-      );
+        formData.append("file", image);
+        formData.append("upload_preset", "restaurant-app"); 
 
-        const imageUrl = cloudinaryResponse.data.secure_url;
-      // Save category to Realtime Database
-      await axios.post(`${DATABASE_URL}/categories.json`, {
+        const cloudinaryRes = await fetch(
+          "https://api.cloudinary.com/v1_1/gckcyscd/image/upload",
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        const cloudinaryData = await cloudinaryRes.json();
+
+        imageUrl = cloudinaryData.secure_url;
+      }
+
+      const categoryData = {
         name: categoryName,
         image: imageUrl,
-      });
+      };
 
-      alert("Category Added Successfully");
+      if (editCategory) {
+        await fetch(
+          `https://restaurant-app-166ea-default-rtdb.firebaseio.com/categories/${editCategory.id}.json`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(categoryData),
+          },
+        );
+
+        alert("Category Updated Successfully");
+      } else {
+        await fetch(
+          "https://restaurant-app-166ea-default-rtdb.firebaseio.com/categories.json",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(categoryData),
+          },
+        );
+
+        alert("Category Added Successfully");
+      }
+
+      fetchCategories();
+      onClose();
 
       setCategoryName("");
       setImage(null);
-      onClose();
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      console.log(err);
       alert("Something went wrong");
     }
   };
@@ -48,57 +90,54 @@ function CategoryModal({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-md rounded-xl bg-white p-6">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-800">Add Category</h2>
+        <h2 className="mb-5 text-2xl font-bold">
+          {editCategory ? "Edit Category" : "Add Category"}
+        </h2>
 
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 hover:bg-slate-100"
-          >
-            <FaTimes />
-          </button>
-        </div>
-
-        <form onSubmit={onSubmitHandler} className="space-y-5">
+        <form onSubmit={submitHandler} className="space-y-4">
           <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Category Name
-            </label>
+            <label className="mb-2 block font-medium">Category Name</label>
 
             <input
               type="text"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              placeholder="Category Name"
+              className="w-full rounded border p-3"
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block font-medium text-slate-700">
-              Category Image
-            </label>
+            <label className="mb-2 block font-medium">Image URL</label>
 
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setImage(e.target.files[0])}
+              className="w-full rounded border p-3"
             />
           </div>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <img
+            src={imageUrl}
+            alt="Preview"
+            className="h-32 w-32 rounded object-cover"
+          />
+
+          <div className="flex justify-end gap-3 pt-3">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-300 px-5 py-2 hover:bg-slate-100"
+              className="rounded border px-5 py-2"
             >
               Cancel
             </button>
 
             <button
               type="submit"
-              className="rounded-lg bg-emerald-600 px-5 py-2 text-white hover:bg-emerald-700"
+              className="rounded bg-emerald-600 px-5 py-2 text-white"
             >
-              Save
+              {editCategory ? "Update Category" : "Add Category"}
             </button>
           </div>
         </form>

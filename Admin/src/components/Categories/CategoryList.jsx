@@ -5,10 +5,11 @@ import CategoryModal from "./CategoryModal";
 function CategoryList() {
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [editCategory, setEditCategory] = useState(null);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [categories]);
 
   const fetchCategories = async () => {
     try {
@@ -33,9 +34,24 @@ function CategoryList() {
     } catch (err) {}
   };
 
-  const deleteCategories = async() =>{
-    
-  }
+  const deleteHandler = async (id) => {
+    console.log(id);
+    try {
+      const res = await fetch(
+        `https://restaurant-app-166ea-default-rtdb.firebaseio.com/categories/${id}.json`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      console.log("doen");
+      fetchCategories();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const editHandler = async (id) => {};
 
   return (
     <>
@@ -105,11 +121,20 @@ function CategoryList() {
 
                   <td className="px-6 py-4">
                     <div className="flex justify-center gap-3">
-                      <button className="rounded-lg bg-blue-100 p-3 text-blue-600 hover:bg-blue-200">
+                      <button
+                        onClick={() => {
+                          setEditCategory(category);
+                          setShowModal(true);
+                        }}
+                        className="rounded-lg bg-blue-100 p-3 text-blue-600 hover:bg-blue-200"
+                      >
                         <FaEdit />
                       </button>
 
-                      <button className="rounded-lg bg-red-100 p-3 text-red-600 hover:bg-red-200">
+                      <button
+                        onClick={() => deleteHandler(category.id)}
+                        className="rounded-lg bg-red-100 p-3 text-red-600 hover:bg-red-200 cursor-pointer"
+                      >
                         <FaTrash />
                       </button>
                     </div>
@@ -121,7 +146,16 @@ function CategoryList() {
         </div>
       </div>
 
-      {showModal && <CategoryModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <CategoryModal
+          show={showModal}
+          onClose={() => {
+            (setShowModal(false), setEditCategory(null));
+          }}
+          editCategory={editCategory}
+          fetchCategories={fetchCategories}
+        />
+      )}
     </>
   );
 }

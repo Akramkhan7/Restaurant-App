@@ -4,6 +4,8 @@ import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgetPassword"
 import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
+import Recipes from "./components/Recipes/Recipes";
+import Orders from "./components/Orders/Orders";
 
 
 function App() {
@@ -25,13 +27,13 @@ function App() {
           <Categories />
         </Route>
 
-        {/* <Route path="/recipes">
+         <Route path="/recipes">
           <Recipes />
         </Route>
 
         <Route path="/orders">
           <Orders />
-        </Route> */}
+        </Route>
       </Switch>
   );
 }
