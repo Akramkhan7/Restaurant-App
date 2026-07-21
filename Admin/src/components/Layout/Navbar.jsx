@@ -4,9 +4,7 @@ function Navbar() {
   return (
     <header className="h-17 bg-white shadow-sm flex items-center justify-between px-8">
       <div>
-        <h2 className="text-2xl font-bold text-slate-800">
-          Dashboard
-        </h2>
+        
 
         <p className="text-sm text-slate-500">
           Welcome back, Admin 👋

@@ -5,10 +5,19 @@ import {
   FaClipboardList,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { useDispatch } from "react-redux";
 
 import { NavLink } from "react-router-dom";
+import { authActions } from "../../store/authSlice";
 
 function Sidebar() {
+  const dispatch = useDispatch();
+
+  const logOutHandler = () =>{
+    dispatch(authActions.logout());
+
+    console.log("done")
+  }
   return (
     <aside className="w-64 min-h-screen bg-slate-900 text-white flex flex-col">
       {/* Logo */}
@@ -20,15 +29,7 @@ function Sidebar() {
 
       {/* Menu */}
       <nav className="flex-1 px-4 py-6 space-y-2">
-        <NavLink
-          exact
-          to="/dashboard"
-          activeClassName="bg-emerald-600"
-          className="flex items-center gap-3 rounded-lg px-4 py-3 hover:bg-slate-800 transition"
-        >
-          <FaHome />
-          Dashboard
-        </NavLink>
+      
 
         <NavLink
           to="/categories"
@@ -60,7 +61,7 @@ function Sidebar() {
 
       {/* Logout */}
       <div className="p-4 border-t border-slate-700">
-        <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-3 hover:bg-red-600 transition">
+        <button onClick={logOutHandler} className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-3 hover:bg-red-600 transition">
           <FaSignOutAlt />
           Logout
         </button>

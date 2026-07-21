@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { categoryActions } from "../../store/CategorySlice";
 
 function CategoryModal({ onClose, editCategory, fetchCategories }) {
   const [categoryName, setCategoryName] = useState("");
@@ -6,6 +8,7 @@ function CategoryModal({ onClose, editCategory, fetchCategories }) {
   const [imageUrl, setImageUrl] = useState(
     "https://placehold.co/300x300/png?text=Category",
   );
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (editCategory) {
@@ -28,7 +31,7 @@ function CategoryModal({ onClose, editCategory, fetchCategories }) {
         const formData = new FormData();
 
         formData.append("file", image);
-        formData.append("upload_preset", "restaurant-app"); 
+        formData.append("upload_preset", "restaurant-app");
 
         const cloudinaryRes = await fetch(
           "https://api.cloudinary.com/v1_1/gckcyscd/image/upload",
@@ -60,9 +63,15 @@ function CategoryModal({ onClose, editCategory, fetchCategories }) {
           },
         );
 
-        alert("Category Updated Successfully");
+        dispatch(
+          categoryActions.updateCategory({
+            id: editCategory.id,
+            ...categoryData,
+          }),
+        );
+       
       } else {
-        await fetch(
+        const res  = await fetch(
           "https://restaurant-app-166ea-default-rtdb.firebaseio.com/categories.json",
           {
             method: "POST",
@@ -72,8 +81,14 @@ function CategoryModal({ onClose, editCategory, fetchCategories }) {
             body: JSON.stringify(categoryData),
           },
         );
+        const data = await res.json();
 
-        alert("Category Added Successfully");
+        dispatch(
+          categoryActions.addCategory({
+            id: data.name,
+            ...categoryData,
+          }),
+        );
       }
 
       fetchCategories();

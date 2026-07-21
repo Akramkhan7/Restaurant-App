@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { recipeActions } from "../../store/RecipeSlice";
 
-function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
+function RecipeModal({ onClose, editRecipe }) {
   const [recipeName, setRecipeName] = useState("");
   const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+
+  const dispatch = useDispatch();
+
+  const categories = useSelector((state) => state.category.categories);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -54,9 +60,16 @@ function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
           },
         );
 
+        dispatch(
+          recipeActions.updateRecipe({
+            id: editRecipe.id,
+            ...recipeData,
+          }),
+        );
+
         alert("Recipe Updated Successfully");
       } else {
-        await fetch(
+        const res = await fetch(
           "https://restaurant-app-166ea-default-rtdb.firebaseio.com/recipes.json",
           {
             method: "POST",
@@ -66,11 +79,18 @@ function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
             body: JSON.stringify(recipeData),
           },
         );
+        const data = res.json();
+
+        dispatch(
+          recipeActions.addRecipe({
+            id: data.name,
+            ...recipeData,
+          }),
+        );
 
         alert("Recipe Added Successfully");
       }
 
-      fetchRecipes();
       onClose();
 
       setRecipeName("");
@@ -88,7 +108,7 @@ function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
     if (editRecipe) {
       setRecipeName(editRecipe.recipeName);
       setCategory(editRecipe.category);
-      setImageUrl(editRecipe.imageUrl);
+      setImageUrl(editRecipe.image);
       setIngredients(editRecipe.ingredients);
       setPrice(editRecipe.price);
     }
@@ -140,9 +160,12 @@ function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-emerald-500 focus:outline-none"
               >
                 <option value="">Select Category</option>
-                <option>Appetizers</option>
-                <option>Main Course</option>
-                <option>Desserts</option>
+
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -234,8 +257,7 @@ function RecipeModal({ onClose, editRecipe, fetchRecipes }) {
               type="submit"
               className="rounded-lg bg-emerald-600 px-6 py-2.5 font-medium text-white transition hover:bg-emerald-700"
             >
-                {editRecipe ? "Update Recipe" : "Save Recipe"}
-              
+              {editRecipe ? "Update Recipe" : "Save Recipe"}
             </button>
           </div>
         </form>

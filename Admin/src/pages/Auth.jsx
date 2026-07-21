@@ -7,8 +7,6 @@ import { authActions } from "../store/authSlice";
 import { useHistory } from "react-router-dom";
 
 function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,93 +23,40 @@ function Auth() {
       return;
     }
 
-    if (!isLogin && !name) {
-      toast.error("Please enter your name.");
-      return;
-    }
-
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const response = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              returnSecureToken: true,
-            }),
+      const response = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error.message);
-        }
-        dispatch(
-          authActions.login({
-            idToken: data.idToken,
-            userId: data.localId,
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
           }),
-        );
+        },
+      );
 
-        toast.success("Login Successful!");
+      const data = await response.json();
 
-        setEmail("");
-        setPassword("");
-        history.push("/dashboard");
-      } else {
-        const response = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              returnSecureToken: true,
-            }),
-          },
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error.message);
-        }
-
-        // Save Display Name
-        await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              idToken: data.idToken,
-              displayName: name,
-              returnSecureToken: true,
-            }),
-          },
-        );
-
-        toast.success("Account Created Successfully!");
-
-        setName("");
-        setEmail("");
-        setPassword("");
-
-        setIsLogin(true);
+      if (!response.ok) {
+        throw new Error(data.error.message);
       }
+      dispatch(
+        authActions.login({
+          token: data.idToken,
+          userId: data.localId,
+        }),
+      );
+      toast.success("Login Successful!");
+
+      setEmail("");
+      setPassword("");
+      history.replace("/categories");
     } catch (err) {
       toast.error(err.message.replaceAll("_", " "));
     } finally {
@@ -121,108 +66,74 @@ function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
         {/* Logo */}
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full bg-emerald-600 flex items-center justify-center text-white text-2xl">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-2xl text-white">
             <FaUtensils />
           </div>
 
           <h1 className="mt-5 text-3xl font-bold text-slate-800">
-            Food Delivery
+            Restaurant Admin
           </h1>
-
-          <p className="mt-2 text-sm text-slate-500">
-            {isLogin ? "Login to your account" : "Create your account"}
-          </p>
         </div>
 
         <form onSubmit={onSubmitHandler} className="mt-8 space-y-5">
-          {!isLogin && (
-            <div>
-              <label className="block mb-2 text-sm font-medium text-slate-700">
-                Full Name
-              </label>
-
-              <input
-                type="text"
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-          )}
-
           <div>
-            <label className="block mb-2 text-sm font-medium text-slate-700">
-              Email
+            <label className="mb-2 block text-sm font-medium text-slate-700">
+              Email Address
             </label>
 
             <input
-              onChange={(e) => setEmail(e.target.value)}
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
+              required
             />
           </div>
 
           <div>
-            <label className="block mb-2 text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700">
               Password
             </label>
 
             <input
-              onChange={(e) => setPassword(e.target.value)}
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
+              className="w-full rounded-lg border border-slate-300 px-4 py-3 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
+              required
             />
           </div>
 
-          {isLogin && (
-            <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
-              >
-                Forgot Password?
-              </Link>
-            </div>
-          )}
+          <div className="flex justify-end">
+            <Link
+              to="/forgot-password"
+              className="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
           <button
             type="submit"
             disabled={loading}
             className="w-full rounded-lg bg-emerald-600 py-3 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+            {loading ? "Signing In..." : "Login"}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-slate-600">
-          {isLogin ? (
-            <>
-              Don't have an account?{" "}
-              <button
-                onClick={() => setIsLogin(false)}
-                type="button"
-                className="font-semibold text-emerald-600 hover:underline"
-              >
-                Sign Up
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                onClick={() => setIsLogin(true)}
-                type="button"
-                className="font-semibold text-emerald-600 hover:underline"
-              >
-                Login
-              </button>
-            </>
-          )}
+        <div className="mt-6 rounded-lg border border-emerald-100 bg-emerald-50 p-4 text-center">
+          <p className="text-sm font-medium text-emerald-700">
+            Restaurant Admin Panel
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Authorized administrators only.
+          </p>
         </div>
       </div>
     </div>

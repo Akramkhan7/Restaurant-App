@@ -1,40 +1,37 @@
-import { Route, Switch } from "react-router-dom";
-
+import { Route, Switch, Redirect } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgetPassword"
-import Dashboard from "./pages/Dashboard";
-import Categories from "./pages/Categories";
-import Recipes from "./components/Recipes/Recipes";
-import Orders from "./components/Orders/Orders";
-
-
+import Categories  from "./pages/Categories"
+import Recipes from './components/Recipes/Recipes'
+import Orders from "./components/Orders/Orders"
 function App() {
+  const isAuthenticated = useSelector(
+    (state) => state.auth.token
+  );
+
   return (
     <Switch>
-        <Route path="/" exact>
-          <Auth />
-        </Route>
+      <Route path="/" exact>
+        <Auth />
+      </Route>
 
-        <Route path="/forgot-password">
-          <ForgotPassword />
-        </Route>
+      <Route path="/forgot-password">
+        <ForgotPassword />
+      </Route>
 
-        <Route path="/dashboard">
-          <Dashboard />
-        </Route>
+      <Route path="/categories">
+        {isAuthenticated ? <Categories /> : <Redirect to="/" />}
+      </Route>
 
-        <Route path="/categories">
-          <Categories />
-        </Route>
+      <Route path="/recipes">
+        {isAuthenticated ? <Recipes /> : <Redirect to="/" />}
+      </Route>
 
-         <Route path="/recipes">
-          <Recipes />
-        </Route>
-
-        <Route path="/orders">
-          <Orders />
-        </Route>
-      </Switch>
+      <Route path="/orders">
+        {isAuthenticated ? <Orders /> : <Redirect to="/" />}
+      </Route>
+    </Switch>
   );
 }
 
