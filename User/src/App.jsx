@@ -8,12 +8,14 @@ import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import { useSelector } from "react-redux";
-
+import Footer from "./components/Layout/Footer";
+import Header from "./components/Layout/Header";
 
 function App() {
   const isAuthenticate = useSelector(
     (state) => state.auth.isAuthenticate
   );
+
 
   if (!isAuthenticate) {
     return (
@@ -26,7 +28,10 @@ function App() {
   }
 
   return (
+    <>
+     <Header />
     <Switch>
+
       <Route path="/home" exact component={Home} />
       <Route
         path="/category/:categoryId"
@@ -39,6 +44,9 @@ function App() {
 
       <Redirect to="/home" />
     </Switch>
+    <Footer />
+   </>
+
   );
 }
 

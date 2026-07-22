@@ -51,14 +51,11 @@ function Home() {
     fetchCategories();
   }, [dispatch, db_url, categories.length]);
 
-
-
   return (
-   <div className="flex min-h-screen flex-col ">
-      <Header />
+    <>
       <CategoryList />
       <Footer />
-    </div>
+    </>
   );
 }
 

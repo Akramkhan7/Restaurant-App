@@ -1,9 +1,11 @@
 import { FaClock, FaShoppingCart, FaStar } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+import { cartActions } from "../../store/cartSlice";
 
 function RecipeCard({ recipe }) {
+  const dispatch = useDispatch();
   return (
     <div className="overflow-hidden rounded-2xl bg-white shadow-md transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      {/* Image */}
       <img
         src={recipe.image}
         alt={recipe.recipeName}
@@ -41,7 +43,9 @@ function RecipeCard({ recipe }) {
         </div>
 
         {/* Add To Cart */}
-        <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700">
+        <button
+          onClick={() => dispatch(cartActions.addToCart(recipe))}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700">
           <FaShoppingCart />
           Add to Cart
         </button>
