@@ -1,6 +1,11 @@
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
+
 function CategoryItem({ category }) {
   return (
-    <div className="cursor-pointer overflow-hidden rounded-2xl bg-white shadow transition hover:-translate-y-1 hover:shadow-lg">
+    <Link
+      to={`/category/${category.id}`}
+      className="cursor-pointer overflow-hidden rounded-2xl bg-white shadow transition hover:-translate-y-1 hover:shadow-lg"
+    >
       <img
         src={category.image}
         alt={category.name}
@@ -12,7 +17,7 @@ function CategoryItem({ category }) {
           {category.name}
         </h2>
       </div>
-    </div>
+    </Link>
   );
 }
 
