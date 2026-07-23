@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 function OrderList() {
   const [orders, setOrders] = useState([]);
 
+  console.log(orders);
   const fetchOrders = async () => {
     try {
       const response = await fetch(
@@ -58,56 +59,81 @@ function OrderList() {
         <p className="text-gray-500">View and manage customer orders.</p>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border">
-        <table className="min-w-full">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-5 py-4 text-left">Customer</th>
-              <th className="px-5 py-4 text-left">Email</th>
-              <th className="px-5 py-4 text-left">Items</th>
-              <th className="px-5 py-4 text-left">Total</th>
-              <th className="px-5 py-4 text-left">Status</th>
-              <th className="px-5 py-4 text-center">Action</th>
-            </tr>
-          </thead>
+      <div className="grid gap-6">
+        {orders.map((order) => (
+          <div
+            key={order.id}
+            className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">
+                  {order.customerName}
+                </h2>
 
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-t hover:bg-gray-50">
-                <td className="px-5 py-4">{order.customerName}</td>
+                <p className="text-sm text-gray-500">{order.email}</p>
 
-                <td className="px-5 py-4">{order.email}</td>
+                <p className="mt-2 text-sm text-gray-600">📍 {order.address}</p>
+              </div>
 
-                <td className="px-5 py-4">{order.address}</td>
+              <span
+                className={`rounded-full px-4 py-1 text-sm font-semibold
+          ${
+            order.status === "Pending"
+              ? "bg-yellow-100 text-yellow-700"
+              : order.status === "Preparing"
+                ? "bg-blue-100 text-blue-700"
+                : order.status === "Delivered"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+          }`}
+              >
+                {order.status}
+              </span>
+            </div>
 
-                <td className="px-5 py-4">
-                  {order.items?.map((item, index) => (
-                    <div key={index}>
-                      {item.recipeName} × {item.quantity}
-                    </div>
-                  ))}
-                </td>
+            <div className="mt-5">
+              <h3 className="mb-2 font-medium text-slate-700">Ordered Items</h3>
 
-                <td className="px-5 py-4 font-semibold">₹{order.totalPrice}</td>
+              {order.items?.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between border-b py-2 text-sm last:border-none"
+                >
+                  <span>{item.recipeName}</span>
 
-                <td className="px-5 py-4">{order.status}</td>
+                  <span>x {item.quantity}</span>
+                </div>
+              ))}
+            </div>
 
-                <td className="px-5 py-4 text-center">
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateStatus(order.id, e.target.value)}
-                    className="rounded-lg border p-2"
-                  >
-                    <option>Pending</option>
-                    <option>Preparing</option>
-                    <option>Delivered</option>
-                    <option>Failed</option>
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            <div className="mt-5 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-blue-600">
+                ₹{order.totalPrice}
+              </h3>
+
+              <select
+                value={order.status}
+                onChange={(e) => updateStatus(order.id, e.target.value)}
+                className={`rounded-lg border px-4 py-2 font-medium outline-none
+          ${
+            order.status === "Pending"
+              ? "border-yellow-400 bg-yellow-50 text-yellow-700"
+              : order.status === "Preparing"
+                ? "border-blue-400 bg-blue-50 text-blue-700"
+                : order.status === "Delivered"
+                  ? "border-green-400 bg-green-50 text-green-700"
+                  : "border-red-400 bg-red-50 text-red-700"
+          }`}
+              >
+                <option>Pending</option>
+                <option>Preparing</option>
+                <option>Delivered</option>
+                <option>Failed</option>
+              </select>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

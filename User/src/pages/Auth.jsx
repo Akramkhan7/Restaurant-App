@@ -46,13 +46,14 @@ function Auth() {
           throw new Error(data.error.message);
         }
 
+        localStorage.setItem("email", email);
         dispatch(
           authActions.login({
             token: data.idToken,
             userId: data.localId,
+            email: email,
           }),
         );
-        console.log("login");
 
         history.replace("/home");
       } else {
@@ -94,11 +95,14 @@ function Auth() {
           },
         );
 
+        dispatch(authActions.setName(name));
+        
         alert("Account created successfully!");
         dispatch(
           authActions.login({
             token: data.idToken,
             userId: data.localId,
+            email:email,
           }),
         );
         setIsLogin(true);

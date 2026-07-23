@@ -7,6 +7,8 @@ import CartModal from "../../services/CartModal";
 import Cart from "../../pages/Cart";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import SearchResults from "./SearchResults";
+import { Link } from "react-router-dom";
+
 
 function Header() {
   const [showCart, setShowCart] = useState(false);
@@ -27,9 +29,9 @@ function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl text-white">
+            <Link to='/home' className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl text-white cursor-pointer">
               <FaUtensils />
-            </div>
+            </Link>
 
             <div>
               <h1 className="text-2xl font-bold text-slate-800">BlueBite</h1>

@@ -10,12 +10,16 @@ function Checkout() {
   const history = useHistory();
 
   const userId = useSelector((state) => state.auth.userId);
+  const name  = useSelector((state) => state.auth.username);
+  console.log(name);
   const [address, setAddress] = useState("");
 
   const totalAmount = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
+
+
 
   const placeOrderHandler = async () => {
     if (address.trim() === "") {
@@ -25,6 +29,7 @@ function Checkout() {
 
     const data = {
       items: cartItems,
+      customerName : name,
       totalAmount,
       address,
       PaymentMethod: "Cash on delivery",

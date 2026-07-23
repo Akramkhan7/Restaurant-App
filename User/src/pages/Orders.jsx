@@ -9,6 +9,7 @@ function Orders() {
   const history = useHistory();
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -60,7 +61,7 @@ function Orders() {
         </button>
       <h1 className="mb-8 text-3xl font-bold">My Orders</h1>
 
-      {orders.map((order) => (
+      {orders?.map((order) => (
         <div
           key={order.id}
           className="mb-6 rounded-lg border bg-white p-6 shadow"
@@ -83,7 +84,7 @@ function Orders() {
             <strong>Payment:</strong> {order.paymentMethod}
           </p>
 
-          {order.items.map((item) => (
+          {order?.items?.map((item) => (
             <div key={item.id} className="flex justify-between border-b py-2">
               <span>
                 {item.name} × {item.quantity}
