@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+:root {
+  --header-height: 88px; /* match your actual header's rendered height */
+}
+
+html {
+  scroll-padding-top: var(--header-height);
+}

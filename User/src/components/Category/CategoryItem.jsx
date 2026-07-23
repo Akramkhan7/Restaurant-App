@@ -4,15 +4,14 @@ function CategoryItem({ category }) {
   return (
     <Link
       to={`/category/${category.id}`}
-      className="cursor-pointer overflow-hidden rounded-2xl bg-white shadow transition hover:-translate-y-1 hover:shadow-lg"
+      className="cursor-pointer overflow-hidden rounded-2xl border border-gray-300  hover:border-blue-500"
     >
       <img
         src={category.image}
-        alt={category.name}
         className="h-48 w-full object-cover"
       />
 
-      <div className="p-4">
+      <div className="p-4 ">
         <h2 className="text-center text-lg font-semibold text-slate-800">
           {category.name}
         </h2>

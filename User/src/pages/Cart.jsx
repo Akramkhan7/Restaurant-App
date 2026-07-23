@@ -4,13 +4,17 @@ import { cartActions } from "../Store/cartSlice";
 import CartModal from "../services/CartModal";
 import { useState } from "react";
 
-function Cart() {
+function Cart({ onClose }) {
   const dispatch = useDispatch();
   const history = useHistory();
 
   const items = useSelector((state) => state.cart.items);
   const totalAmount = useSelector((state) => state.cart.totalAmount);
 
+  const onProceedHandler = () => {
+    onClose(); 
+    history.push("/checkout"); 
+  };
   if (items.length === 0) {
     return (
       <div className="mt-20 text-center">
@@ -42,9 +46,7 @@ function Cart() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() =>
-                dispatch(cartActions.decreaseQuantity(item.id))
-              }
+              onClick={() => dispatch(cartActions.decreaseQuantity(item.id))}
               className="rounded bg-gray-300 px-3 py-1"
             >
               -
@@ -53,23 +55,17 @@ function Cart() {
             <span>{item.quantity}</span>
 
             <button
-              onClick={() =>
-                dispatch(cartActions.increaseQuantity(item.id))
-              }
+              onClick={() => dispatch(cartActions.increaseQuantity(item.id))}
               className="rounded bg-gray-300 px-3 py-1"
             >
               +
             </button>
           </div>
 
-          <div>
-            ₹{item.price * item.quantity}
-          </div>
+          <div>₹{item.price * item.quantity}</div>
 
           <button
-            onClick={() =>
-              dispatch(cartActions.removeFromCart(item.id))
-            }
+            onClick={() => dispatch(cartActions.removeFromCart(item.id))}
             className="rounded bg-red-600 px-4 py-2 text-white"
           >
             Remove
@@ -78,12 +74,10 @@ function Cart() {
       ))}
 
       <div className="mt-8 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">
-          Total: ₹{totalAmount}
-        </h2>
+        <h2 className="text-2xl font-bold">Total: ₹{totalAmount}</h2>
 
         <button
-          onClick={() => history.push("/checkout")}
+          onClick={onProceedHandler}
           className="rounded bg-green-600 px-6 py-3 text-white"
         >
           Proceed to Checkout

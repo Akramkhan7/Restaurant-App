@@ -3,50 +3,52 @@ import { useEffect, useState } from "react";
 function OrderList() {
   const [orders, setOrders] = useState([]);
 
-  console.log(orders);
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch(
-        "https://restaurant-app-166ea-default-rtdb.firebaseio.com/orders.json",
-      );
+ const fetchOrders = async () => {
+  try {
+    const response = await fetch(
+      "https://restaurant-app-166ea-default-rtdb.firebaseio.com/orders.json"
+    );
 
-      const data = await response.json();
+    const data = await response.json();
 
-      const loadedOrders = [];
+    const loadedOrders = [];
 
-      for (const key in data) {
+    for (const userId in data) {
+      for (const orderId in data[userId]) {
         loadedOrders.push({
-          id: key,
-          ...data[key],
+          id: orderId,
+          userId,
+          ...data[userId][orderId],
         });
       }
-
-      setOrders(loadedOrders);
-    } catch (err) {
-      console.log(err);
     }
-  };
 
-  const updateStatus = async (id, status) => {
-    try {
-      await fetch(
-        `https://restaurant-app-166ea-default-rtdb.firebaseio.com/orders/${id}.json`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-          }),
+    setOrders(loadedOrders);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+  const updateStatus = async (userId, orderId, status) => {
+  try {
+    await fetch(
+      `https://restaurant-app-166ea-default-rtdb.firebaseio.com/orders/${userId}/${orderId}.json`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          status,
+        }),
+      }
+    );
 
-      fetchOrders();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    fetchOrders();
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   useEffect(() => {
     fetchOrders();
@@ -60,79 +62,79 @@ function OrderList() {
       </div>
 
       <div className="grid gap-6">
-        {orders.map((order) => (
-          <div
-            key={order.id}
-            className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-lg font-semibold text-slate-800">
-                  {order.customerName}
-                </h2>
+        {orders?.map((order) => (
+         <div 
+          key={order.id}
+           className="rounded-xl border bg-white p-6 shadow-sm">
+  <div className="flex items-start justify-between border-b pb-4">
+    <div>
+      <h2 className="text-xl font-bold">{order.customerName}</h2>
+      <p className="text-gray-500">{order.address}</p>
+      <p className="text-sm text-gray-400">
+        {new Date(order.orderedAt).toLocaleString()}
+      </p>
+      <p className="text-sm font-medium">
+        Payment : {order.PaymentMethod}
+      </p>
+    </div>
 
-                <p className="text-sm text-gray-500">{order.email}</p>
+    <select
+      value={order.status}
+      onChange={(e) =>  updateStatus(order.userId, order.id, e.target.value)}
+      className="rounded-lg border px-4 py-2"
+    >
+      <option>Pending</option>
+      <option>Preparing</option>
+      <option>Delivered</option>
+      <option>Failed</option>
+    </select>
+  </div>
 
-                <p className="mt-2 text-sm text-gray-600">📍 {order.address}</p>
-              </div>
+  {/* Items */}
+  <div className="mt-5">
+    <h3 className="mb-3 font-semibold">Ordered Items</h3>
 
-              <span
-                className={`rounded-full px-4 py-1 text-sm font-semibold
-          ${
-            order.status === "Pending"
-              ? "bg-yellow-100 text-yellow-700"
-              : order.status === "Preparing"
-                ? "bg-blue-100 text-blue-700"
-                : order.status === "Delivered"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-          }`}
-              >
-                {order.status}
-              </span>
-            </div>
+    {order?.items?.map((item) => (
+      <div
+        key={item.id}
+        className="flex items-center justify-between border-b py-3"
+      >
+        <div className="flex items-center gap-4">
+          <img
+            src={item.image}
+            alt={item.recipeName}
+            className="h-16 w-16 rounded-lg object-cover"
+          />
 
-            <div className="mt-5">
-              <h3 className="mb-2 font-medium text-slate-700">Ordered Items</h3>
-
-              {order.items?.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between border-b py-2 text-sm last:border-none"
-                >
-                  <span>{item.recipeName}</span>
-
-                  <span>x {item.quantity}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-blue-600">
-                ₹{order.totalPrice}
-              </h3>
-
-              <select
-                value={order.status}
-                onChange={(e) => updateStatus(order.id, e.target.value)}
-                className={`rounded-lg border px-4 py-2 font-medium outline-none
-          ${
-            order.status === "Pending"
-              ? "border-yellow-400 bg-yellow-50 text-yellow-700"
-              : order.status === "Preparing"
-                ? "border-blue-400 bg-blue-50 text-blue-700"
-                : order.status === "Delivered"
-                  ? "border-green-400 bg-green-50 text-green-700"
-                  : "border-red-400 bg-red-50 text-red-700"
-          }`}
-              >
-                <option>Pending</option>
-                <option>Preparing</option>
-                <option>Delivered</option>
-                <option>Failed</option>
-              </select>
-            </div>
+          <div>
+            <p className="font-medium">{item.recipeName}</p>
+            <p className="text-sm text-gray-500">
+              {item.category}
+            </p>
           </div>
+        </div>
+
+        <div className="text-right">
+          <p>₹{item.price}</p>
+          <p className="text-sm text-gray-500">
+            Qty : {item.quantity || 1}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {/* Footer */}
+  <div className="mt-5 flex items-center justify-between">
+    <span className="font-bold text-gray-700">
+      Total
+    </span>
+
+    <span className="text-2xl font-bold text-blue-600">
+      ₹{order.totalAmount}
+    </span>
+  </div>
+</div>
         ))}
       </div>
     </div>

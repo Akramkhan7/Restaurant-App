@@ -9,7 +9,6 @@ import ProfileDropdown from "../Profile/ProfileDropdown";
 import SearchResults from "./SearchResults";
 import { Link } from "react-router-dom";
 
-
 function Header() {
   const [showCart, setShowCart] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -29,10 +28,12 @@ function Header() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <Link to='/home' className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl text-white cursor-pointer">
+            <Link
+              to="/home"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-xl text-white cursor-pointer"
+            >
               <FaUtensils />
             </Link>
-
             <div>
               <h1 className="text-2xl font-bold text-slate-800">BlueBite</h1>
               <p className="text-xs text-slate-500">Fresh Food Delivered</p>
@@ -42,7 +43,6 @@ function Header() {
           {/* Search */}
           <div className="hidden w-2/5 items-center rounded-full border border-slate-300 bg-slate-100 px-4 py-2 md:flex">
             <FiSearch className="text-slate-500" />
-
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -56,10 +56,9 @@ function Header() {
           <div className="flex items-center gap-6">
             <button
               onClick={() => setShowCart(true)}
-              className="relative  text-slate-700 hover:text-blue-600"
+              className="relative text-slate-700 hover:text-blue-600"
             >
               <FaShoppingCart size={25} />
-
               {totalItems > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
                   {totalItems}
@@ -74,8 +73,7 @@ function Header() {
               >
                 <FaUserCircle size={25} />
               </button>
-
-              {showDropdown && <ProfileDropdown />}
+              {showDropdown && <ProfileDropdown  setShowDropdown={setShowDropdown}/>}
             </div>
           </div>
         </div>
@@ -83,7 +81,7 @@ function Header() {
 
       {showCart && (
         <CartModal onClose={() => setShowCart(false)}>
-          <Cart />
+          <Cart onClose={() => setShowCart(false)} />
         </CartModal>
       )}
 
