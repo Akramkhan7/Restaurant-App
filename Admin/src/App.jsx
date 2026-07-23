@@ -5,6 +5,7 @@ import ForgotPassword from "./pages/ForgetPassword"
 import Categories  from "./pages/Categories"
 import Recipes from './components/Recipes/Recipes'
 import Orders from "./components/Orders/Orders"
+import Dashboard from "./pages/Dashboard";
 function App() {
   const isAuthenticated = useSelector(
     (state) => state.auth.token
@@ -30,6 +31,10 @@ function App() {
 
       <Route path="/orders">
         {isAuthenticated ? <Orders /> : <Redirect to="/" />}
+      </Route>
+
+      <Route path="/dashboard">
+        {isAuthenticated ? <Dashboard /> : <Redirect to="/" />}
       </Route>
     </Switch>
   );
