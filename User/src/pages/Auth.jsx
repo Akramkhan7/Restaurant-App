@@ -79,6 +79,8 @@ function Auth() {
           throw new Error(data.error.message);
         }
 
+        dispatch(authActions.setName(name));
+
         // Update display name
         await fetch(
           `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
@@ -95,7 +97,6 @@ function Auth() {
           },
         );
 
-        dispatch(authActions.setName(name));
         
         alert("Account created successfully!");
         dispatch(

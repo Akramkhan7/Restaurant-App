@@ -14,35 +14,13 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
 
-        const res = await fetch(
-          `${db_url}/profiles/${userId}.json`
-        );
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch profile");
-        }
+  useEffect(()=>{
+   const name =  localStorage.getItem('username');
+   nameRef.current.value = name;
 
-        const data = await res.json();
-
-        if (data) {
-          nameRef.current.value = data.fullName || "";
-        }
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userId) {
-      fetchProfile();
-    }
-  }, [db_url, userId]);
+  },[])
 
   const submitHandler = async (e) => {
     e.preventDefault();

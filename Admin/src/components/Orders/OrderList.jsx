@@ -54,7 +54,14 @@ function OrderList() {
         }
       );
 
-      fetchOrders();
+      setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId
+          ? { ...order, status }
+          : order
+      )
+    );
+    
     } catch (err) {
       console.log(err);
     }
