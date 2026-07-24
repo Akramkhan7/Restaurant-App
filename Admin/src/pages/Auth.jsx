@@ -67,7 +67,6 @@ function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        {/* Logo */}
         <div className="flex flex-col items-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-2xl text-white">
             <FaUtensils />

@@ -88,7 +88,6 @@ function Dashboard() {
   return (
     <Layout>
     <div className="space-y-8">
-      {/* Heading */}
       <div>
         <h1 className="text-3xl font-bold text-slate-800">
         Dashboard
@@ -99,7 +98,6 @@ function Dashboard() {
         </p>
       </div>
 
-      {/* Stats */}
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-lg border border-slate-200 bg-white p-6">
           <div className="flex items-center justify-between">

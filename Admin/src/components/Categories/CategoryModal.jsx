@@ -26,7 +26,6 @@ function CategoryModal({ onClose, editCategory, fetchCategories }) {
     try {
       let imageUrl = editCategory?.image || "";
 
-      // Upload new image only if one is selected
       if (image) {
         const formData = new FormData();
 

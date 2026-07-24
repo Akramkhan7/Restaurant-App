@@ -117,7 +117,6 @@ function RecipeModal({ onClose, editRecipe }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl">
-        {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-2">
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Add New Recipe</h2>
@@ -131,7 +130,6 @@ function RecipeModal({ onClose, editRecipe }) {
           </button>
         </div>
 
-        {/* Body */}
         <form onSubmit={submitHandler} className="space-y-4 p-6">
           {/* Recipe Name & Category */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -170,7 +168,6 @@ function RecipeModal({ onClose, editRecipe }) {
             </div>
           </div>
 
-          {/* Price */}
           <div>
             <label className="mb-2 block font-medium text-gray-700">
               Price
@@ -185,7 +182,6 @@ function RecipeModal({ onClose, editRecipe }) {
             />
           </div>
 
-          {/* Ingredients */}
           <div>
             <label className="mb-2 block font-medium text-gray-700">
               Ingredients
@@ -200,7 +196,6 @@ function RecipeModal({ onClose, editRecipe }) {
             />
           </div>
 
-          {/* Image Upload */}
           <div>
             <label className="mb-2 block font-medium text-gray-700">
               Recipe Image
@@ -243,7 +238,6 @@ function RecipeModal({ onClose, editRecipe }) {
             )}
           </div>
 
-          {/* Footer */}
           <div className="flex justify-end gap-3 border-t pt-5">
             <button
               type="button"

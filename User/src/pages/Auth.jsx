@@ -3,6 +3,7 @@ import { FaUtensils } from "react-icons/fa";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../store/authSlice";
+import { toast } from "react-toastify";
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,111 +19,116 @@ function Auth() {
   const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    try {
-      if (isLogin) {
-        // LOGIN
-        const res = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              returnSecureToken: true,
-            }),
+  try {
+    if (isLogin) {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error.message);
-        }
-
-        localStorage.setItem("email", email);
-        dispatch(
-          authActions.login({
-            token: data.idToken,
-            userId: data.localId,
-            email: email,
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
           }),
-        );
-
-        history.replace("/home");
-      } else {
-        // SIGNUP
-        const res = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email,
-              password,
-              returnSecureToken: true,
-            }),
-          },
-        );
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error.message);
         }
+      );
 
-        dispatch(authActions.setName(name));
+      const data = await res.json();
 
-        // Update display name
-        await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              idToken: data.idToken,
-              displayName: name,
-              returnSecureToken: true,
-            }),
-          },
-        );
-
-        
-        alert("Account created successfully!");
-        dispatch(
-          authActions.login({
-            token: data.idToken,
-            userId: data.localId,
-            email:email,
-          }),
-        );
-        setIsLogin(true);
-
-        setName("");
-        setEmail("");
-        setPassword("");
+      if (!res.ok) {
+        throw new Error(data.error.message);
       }
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setIsLoading(false);
+
+      localStorage.setItem("email", email);
+
+      dispatch(
+        authActions.login({
+          token: data.idToken,
+          userId: data.localId,
+          email,
+          username: data.displayName || "",
+        })
+      );
+
+      history.replace("/home");
+    } else {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            returnSecureToken: true,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error.message);
+      }
+
+      // Save display name
+      const updateRes = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idToken: data.idToken,
+            displayName: name,
+            returnSecureToken: true,
+            
+          }),
+        }
+      );
+
+      const updateData = await updateRes.json();
+
+      if (!updateRes.ok) {
+        throw new Error(updateData.error.message);
+      }
+
+      toast.success("Account created successfully.");
+
+      dispatch(
+        authActions.login({
+          token: data.idToken,
+          userId: data.localId,
+          email,
+          username: updateData.displayName || "",
+        })
+      );
+
+      setIsLogin(true);
+      setName("");
+      setEmail("");
+      setPassword("");
     }
-  };
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-slate-100 to-blue-100 flex items-center justify-center px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl border border-slate-200">
-        {/* Logo */}
         <div className="flex flex-col items-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-3xl text-white shadow-md">
             <FaUtensils />
@@ -135,7 +141,6 @@ function Auth() {
           </p>
         </div>
 
-        {/* Form */}
         <form onSubmit={onSubmitHandler} className="mt-8 space-y-5">
           {!isLogin && (
             <div>
@@ -200,7 +205,6 @@ function Auth() {
           </button>
         </form>
 
-        {/* Toggle */}
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             {isLogin ? "Don't have an account?" : "Already have an account?"}

@@ -34,7 +34,6 @@ function RecipeList() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Recipes</h1>
@@ -76,14 +75,12 @@ function RecipeList() {
                 key={recipe.id}
                 className="flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white"
               >
-                {/* Image */}
                 <img
                   src={recipe.image}
                   alt={recipe.recipeName}
                   className="h-48 w-full object-cover"
                 />
 
-                {/* Content */}
                 <div className="flex flex-1 flex-col p-4">
                   {/* Name & Price */}
                   <div className="flex items-start justify-between gap-2">
@@ -96,19 +93,16 @@ function RecipeList() {
                     </span>
                   </div>
 
-                  {/* Category */}
                   <span className="mt-3 inline-block w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
                     {recipe.category}
                   </span>
 
-                  {/* Ingredients */}
                   <div className="mt-4 min-h-[80px]">
                     <p className="line-clamp-3 text-sm text-slate-500">
                       {recipe.ingredients}
                     </p>
                   </div>
 
-                  {/* Buttons */}
                   <div className="mt-auto flex gap-3 pt-5">
                     <button
                       onClick={() => {

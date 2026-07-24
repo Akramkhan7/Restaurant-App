@@ -1,26 +1,48 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { authActions } from "../store/authSlice";
-import {useDispatch}from "react-redux";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 function Profile() {
-  const db_url = import.meta.env.VITE_DATABASE_URL
+  const db_url = import.meta.env.VITE_DATABASE_URL;
+  const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
+
   const dispatch = useDispatch();
+
   const userId = useSelector((state) => state.auth.userId);
   const email = useSelector((state) => state.auth.email);
+  const token = useSelector((state) => state.auth.token);
 
   const nameRef = useRef();
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`${db_url}/profiles/${userId}.json`);
+        const data = await res.json();
 
+        const name = data?.fullName || localStorage.getItem("username") || "";
+        if (nameRef.current) {
+          nameRef.current.value = name;
+        }
+      } catch (err) {
+        console.log(err);
+        const cached = localStorage.getItem("username");
+        if (nameRef.current) {
+          nameRef.current.value = cached || "";
+        }
+      }
+    };
 
-  useEffect(()=>{
-   const name =  localStorage.getItem('username');
-   nameRef.current.value = name;
-
-  },[])
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId, db_url]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -34,26 +56,50 @@ function Profile() {
         email,
       };
 
-      const res = await fetch(
-        `${db_url}/profiles/${userId}.json`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(profile),
-        }
-      );
+      const res = await fetch(`${db_url}/profiles/${userId}.json`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profile),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to update profile");
       }
+
+      // Update Firebase Authentication displayName
+      const authRes = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idToken: token,
+            displayName: nameRef.current.value,
+            returnSecureToken: true,
+          }),
+        },
+      );
+
+      const authData = await authRes.json();
+
+      if (!authRes.ok) {
+        throw new Error(authData.error.message);
+      }
+
       dispatch(authActions.setName(nameRef.current.value));
 
+      localStorage.setItem("username", nameRef.current.value);
+
       setMessage("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (err) {
       console.log(err);
-      setMessage("Something went wrong.");
+      setMessage(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
